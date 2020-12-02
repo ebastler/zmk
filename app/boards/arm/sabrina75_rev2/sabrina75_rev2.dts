@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Moritz Plattner (ebastler)
+ * Copyright (c) 2020 The ZMK Contributors
  *
  * SPDX-License-Identifier: MIT
  */
@@ -9,8 +9,8 @@
 #include <dt-bindings/zmk/matrix-transform.h>
 
 / {
-	model = "isometria75, rev2";
-	compatible = "isometria75,rev2";
+	model = "sabrina75, rev2";
+	compatible = "sabrina75,rev2";
 
 	chosen {
 		zephyr,code-partition = &code_partition;

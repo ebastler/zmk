@@ -1,0 +1,8 @@
+# sabrina75 rev2 board configuration
+
+# Copyright (c) 2020 The ZMK Contributors
+# SPDX-License-Identifier: MIT
+
+config BOARD_SABRINA75_REV2
+	bool "sabrina75 Keyboard"
+	depends on SOC_NRF52840_QIAA

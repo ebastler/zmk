@@ -1,12 +1,12 @@
-# isometria75 rev2 board configuration
+# sabrina75 rev2 board configuration
 
 # Copyright (c) 2020 The ZMK Contributors
 # SPDX-License-Identifier: MIT
 
-if BOARD_ISOMETRIA75_REV2
+if BOARD_SABRINA75_REV2
 
 config ZMK_KEYBOARD_NAME
-	default "isometria75 rev2"
+	default "sabrina75"
 
 if USB
 
@@ -30,4 +30,4 @@ config ZMK_USB
 config ZMK_BATTERY_VOLTAGE_DIVIDER
 	default y
 
-endif # BOARD_ISOMETRIA75_REV2
+endif # BOARD_SABRINA75_REV2
