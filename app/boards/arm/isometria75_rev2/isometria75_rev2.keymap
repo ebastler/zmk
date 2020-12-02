@@ -19,7 +19,7 @@
 // | CTRL  | WIN   | ALT   |                        SPACE                          | ALT   | LT 1  | LFT   | DWN   | RGT   |
 
 			bindings = <
-	&kp ESC          &kp F1           &kp F2           &kp F3        &kp F4        &trans        &kp F5           &kp F6           &kp F7           &kp F8           &kp F9           &kp F10          &kp F11          &kp F12          &kp PSCRN       &kp K_PP
+	&kp ESC          &kp F1           &kp F2           &kp F3        &kp F4        &trans        &kp F5           &kp F6           &kp F7           &kp F8           &kp F9           &kp F10          &kp F11          &kp F12          &kp PSCRN       &kp C_PLAY_PAUSE
 	&kp GRAV         &kp NUM_1        &kp NUM_2        &kp NUM_3     &kp NUM_4     &kp NUM_5     &kp NUM_6        &kp NUM_7        &kp NUM_8        &kp NUM_9        &kp NUM_0        &kp MINUS        &kp EQL          &trans           &kp BKSP        &kp HOME
 	&kp TAB          &trans           &kp Q            &kp W         &kp E         &kp R         &kp T            &kp Y            &kp U            &kp I            &kp O            &kp P            &kp LBKT         &kp RBKT         &kp BSLH        &kp PG_UP
 	&kp CAPS         &trans           &kp A            &kp S         &kp D         &kp F         &kp G            &kp H            &kp J            &kp K            &kp L            &kp SCLN         &kp QUOT         &kp NON_US_HASH  &kp RET         &kp PG_DN
@@ -27,7 +27,7 @@
     &kp LCTRL        &kp LGUI         &kp LALT         &trans        &trans        &trans        &kp SPACE        &trans           &trans           &trans           &kp RALT         &mo 1            &trans           &kp LEFT         &kp DOWN        &kp RIGHT
 			>;
 			
-			sensor-bindings = <&inc_dec_kp A B>;
+			sensor-bindings = <&inc_dec_kp C_VOL_DN C_VOL_UP>;
 			
 		};
 
@@ -40,7 +40,7 @@
 // |       |       |       |                                                       |       | LT 1  |       |       |       |
 
 			bindings = <
-	&rgb_ug RGB_TOG  &rgb_ug RGB_BRD  &rgb_ug RGB_BRI  &trans        &trans        &trans        &rgb_ug RGB_HUD  &rgb_ug RGB_HUI  &rgb_ug RGB_SAD  &rgb_ug RGB_SAI  &rgb_ug RGB_EFR  &rgb_ug RGB_EFF  &rgb_ug RGB_SPD  &rgb_ug RGB_SPI  &trans          &kp K_MUTE
+	&rgb_ug RGB_TOG  &rgb_ug RGB_BRD  &rgb_ug RGB_BRI  &trans        &trans        &trans        &rgb_ug RGB_HUD  &rgb_ug RGB_HUI  &rgb_ug RGB_SAD  &rgb_ug RGB_SAI  &rgb_ug RGB_EFR  &rgb_ug RGB_EFF  &rgb_ug RGB_SPD  &rgb_ug RGB_SPI  &trans          &kp C_MUTE
 	&trans           &trans           &trans           &trans        &trans        &trans        &trans           &trans           &trans           &trans           &trans           &trans           &trans           &trans           &kp DEL         &trans    
 	&trans           &trans           &trans           &trans        &trans        &trans        &trans           &trans           &trans           &trans           &trans           &trans           &trans           &trans           &trans          &trans    
 	&trans           &trans           &trans           &trans        &trans        &trans        &trans           &trans           &trans           &trans           &trans           &trans           &trans           &trans           &trans          &trans    
@@ -48,7 +48,7 @@
 	&trans           &trans           &trans           &trans        &trans        &trans        &trans           &trans           &trans           &trans           &trans           &mo 1            &trans           &trans           &trans          &trans
 			>;
 
-			sensor-bindings = <&inc_dec_kp A B>;
+			sensor-bindings = <&inc_dec_kp C_PREV C_NEXT>;
 
 		};
 
@@ -68,7 +68,7 @@
 	&trans           &trans           &trans           &trans        &trans        &trans        &trans           &trans           &trans           &trans           &trans           &mo 1            &trans           &trans           &trans          &trans
 			>;
 
-			sensor-bindings = <&inc_dec_kp A B>;
+			sensor-bindings = <&inc_dec_kp C_BRI_DN C_BRI_UP>;
 
 		};
 	};

@@ -52,13 +52,17 @@
 			;
 	};
 
+	sensors {
+    	compatible = "zmk,keymap-sensors";
+    	sensors = <&left_encoder>;
+	};
+
 	left_encoder: encoder_left {
         compatible = "alps,ec11";
         label = "LEFT_ENCODER";
-        a-gpios = <&gpio1 11 GPIO_ACTIVE_HIGH>;
-        b-gpios = <&gpio1 10 GPIO_ACTIVE_HIGH>;
-        resolution = <4>;
-		status = "okay";
+        a-gpios = <&gpio1 11 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
+        b-gpios = <&gpio1 10 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
+        resolution = <2>;
     };
 
 	ext-power {
