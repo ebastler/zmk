@@ -1,6 +1,6 @@
 
 identifier: isometria75_rev2
-name: isometria75 rev2
+name: isometria75
 type: mcu
 arch: arm
 toolchain:

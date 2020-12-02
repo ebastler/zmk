@@ -6,7 +6,7 @@
 if BOARD_ISOMETRIA75_REV2
 
 config ZMK_KEYBOARD_NAME
-	default "isometria75 rev2"
+	default "isometria75"
 
 if USB
 
