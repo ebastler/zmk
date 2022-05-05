@@ -1,18 +1,16 @@
 /*
- * Copyright (c) 2020 The ZMK Contributors
+ * Copyright (c) 2022 The ZMK Contributors
  *
  * SPDX-License-Identifier: MIT
  */
 
 /dts-v1/;
 #include <nordic/nrf52840_qiaa.dtsi>
-
-#include <dt-bindings/led/led.h>
 #include <dt-bindings/zmk/matrix_transform.h>
 
 / {
-	model = "altar, rev1";
-	compatible = "altar, rev1";
+	model = "altar,rev1";
+	compatible = "altar,rev1";
 
 	chosen {
 		zephyr,code-partition = &code_partition;
@@ -65,6 +63,14 @@
 			, <&gpio0 23 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
 			, <&gpio1 2  (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
 			;
+	};
+
+	leds {
+		compatible = "gpio-leds";
+		blue_led: led_0 {
+			gpios = <&gpio0 19 GPIO_ACTIVE_HIGH>;
+			label = "White LED";
+		};
 	};
 
 	sensors {
