@@ -6,7 +6,6 @@
 
 #define DT_DRV_COMPAT maxim_max17048
 
-#include <device.h>
 #include <kernel.h>
 #include <sys/util.h>
 #include <logging/log.h>
