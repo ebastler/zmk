@@ -6,7 +6,6 @@
 
 #pragma once
 
-#include <device.h>
 #include <sys/util.h>
 
 #ifdef __cplusplus
