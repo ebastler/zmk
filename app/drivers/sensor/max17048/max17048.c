@@ -6,11 +6,13 @@
 
 #define DT_DRV_COMPAT maxim_max17048
 
-#include <sys/util.h>
-#include <logging/log.h>
-#include <drivers/i2c.h>
-#include <sys/byteorder.h>
-#include <drivers/sensor.h>
+#include <zephyr/device.h>
+#include <zephyr/kernel.h>
+#include <zephyr/sys/util.h>
+#include <zephyr/logging/log.h>
+#include <zephyr/drivers/i2c.h>
+#include <zephyr/sys/byteorder.h>
+#include <zephyr/drivers/sensor.h>
 
 #include "max17048.h"
 
@@ -24,15 +26,16 @@ static int read_register(const struct device *dev, uint8_t reg, uint16_t *value)
 
     struct max17048_drv_data *const drv_data = dev->data;
     uint16_t dev_addr = ((struct max17048_config *)dev->config)->device_addr;
-
     uint16_t data = 0;
-    int ret = i2c_burst_read(drv_data->i2c, dev_addr, reg, (uint8_t *)&data, sizeof(data));
-    if (ret != 0) {
+    uint8_t i2c_data[2];
+    int ret = i2c_burst_read(drv_data->i2c, dev_addr, reg, i2c_data, sizeof(data));
+    if (ret < 0) {
         LOG_DBG("i2c_write_read FAIL %d\n", ret);
         return ret;
     }
-
+    data = i2c_data[1] | (i2c_data[0] << 8);
     *value = sys_le16_to_cpu(data);
+
     return 0;
 }
 
