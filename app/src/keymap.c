@@ -4,16 +4,17 @@
  * SPDX-License-Identifier: MIT
  */
 
+#include <drivers/behavior.h>
 #include <zephyr/sys/util.h>
 #include <zephyr/bluetooth/bluetooth.h>
 #include <zephyr/logging/log.h>
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
+#include <zmk/behavior.h>
+#include <zmk/keymap.h>
 #include <zmk/matrix.h>
 #include <zmk/sensors.h>
-#include <zmk/keymap.h>
-#include <drivers/behavior.h>
-#include <zmk/behavior.h>
+#include <zmk/virtual_key_position.h>
 
 #include <zmk/ble.h>
 #if ZMK_BLE_IS_CENTRAL
@@ -254,7 +255,7 @@ int zmk_keymap_position_state_changed(uint8_t source, uint32_t position, bool pr
 int zmk_keymap_sensor_triggered(uint8_t sensor_number, const struct device *sensor,
                                 int64_t timestamp) {
     for (int layer = ZMK_KEYMAP_LAYERS_LEN - 1; layer >= _zmk_keymap_layer_default; layer--) {
-        if (zmk_keymap_layer_active(layer) && zmk_sensor_keymap[layer] != NULL) {
+        if (zmk_keymap_layer_active(layer)) {
             struct zmk_behavior_binding *binding = &zmk_sensor_keymap[layer][sensor_number];
             const struct device *behavior;
             int ret;
@@ -269,7 +270,9 @@ int zmk_keymap_sensor_triggered(uint8_t sensor_number, const struct device *sens
                 continue;
             }
 
-            ret = behavior_sensor_keymap_binding_triggered(binding, sensor, timestamp);
+            struct zmk_behavior_binding_event event = {
+                .position = ZMK_VIRTUAL_KEY_POSITION_SENSOR(sensor_number), .timestamp = timestamp};
+            ret = behavior_sensor_keymap_binding_triggered(binding, sensor, event);
 
             if (ret > 0) {
                 LOG_DBG("behavior processing to continue to next layer");
