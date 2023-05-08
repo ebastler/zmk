@@ -11,3 +11,5 @@ compatible: "maxim,max17048"
 include: i2c-device.yaml
 
 properties:
+    label:
+      required: false

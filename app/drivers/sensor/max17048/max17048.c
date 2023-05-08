@@ -16,7 +16,7 @@
 
 #include "max17048.h"
 
-LOG_MODULE_REGISTER(sensor_max17048, CONFIG_SENSOR_LOG_LEVEL);
+LOG_MODULE_REGISTER(MAX17048, CONFIG_SENSOR_LOG_LEVEL);
 
 static int read_register(const struct device *dev, uint8_t reg, uint16_t *value) {
 
@@ -25,16 +25,16 @@ static int read_register(const struct device *dev, uint8_t reg, uint16_t *value)
     }
 
     struct max17048_config *config = (struct max17048_config *)dev->config;
-
-    uint8_t data[2] = {0};
-    int ret = i2c_burst_read_dt(&config->i2c_bus, reg, &data[0], sizeof(data));
-    if (ret != 0) {
+    uint16_t data = 0;
+    uint8_t i2c_data[2];
+    int ret = i2c_burst_read_dt(&config->i2c_bus, reg, i2c_data, sizeof(data));
+    if (ret < 0) {
         LOG_DBG("i2c_write_read FAIL %d\n", ret);
         return ret;
     }
+    data = i2c_data[1] | (i2c_data[0] << 8);
+    *value = sys_le16_to_cpu(data);
 
-    // the register values are returned in big endian (MSB first)
-    *value = sys_get_be16(data);
     return 0;
 }
 
@@ -46,45 +46,34 @@ static int write_register(const struct device *dev, uint8_t reg, uint16_t value)
 
     struct max17048_config *config = (struct max17048_config *)dev->config;
 
-    uint8_t data[2] = {0};
-    sys_put_be16(value, &data[0]);
+    uint16_t data = sys_cpu_to_le16(value);
 
-    return i2c_burst_write_dt(&config->i2c_bus, reg, &data[0], sizeof(data));
+    return i2c_burst_write_dt(&config->i2c_bus, reg, (uint8_t *)&data, sizeof(data));
 }
 
 static int set_rcomp_value(const struct device *dev, uint8_t rcomp_value) {
 
-    struct max17048_drv_data *const drv_data = (struct max17048_drv_data *const)dev->data;
-    k_sem_take(&drv_data->lock, K_FOREVER);
-
     uint16_t tmp = 0;
     int err = read_register(dev, REG_CONFIG, &tmp);
     if (err != 0) {
-        goto done;
+        return err;
     }
 
     tmp = ((uint16_t)rcomp_value << 8) | (tmp & 0xFF);
     err = write_register(dev, REG_CONFIG, tmp);
     if (err != 0) {
-        goto done;
+        return err;
     }
 
     LOG_DBG("set RCOMP to %d", rcomp_value);
-
-done:
-    k_sem_give(&drv_data->lock);
-    return err;
+    return 0;
 }
 
 static int set_sleep_enabled(const struct device *dev, bool sleep) {
-
-    struct max17048_drv_data *const drv_data = (struct max17048_drv_data *const)dev->data;
-    k_sem_take(&drv_data->lock, K_FOREVER);
-
     uint16_t tmp = 0;
     int err = read_register(dev, REG_CONFIG, &tmp);
     if (err != 0) {
-        goto done;
+        return err;
     }
 
     if (sleep) {
@@ -95,55 +84,40 @@ static int set_sleep_enabled(const struct device *dev, bool sleep) {
 
     err = write_register(dev, REG_CONFIG, tmp);
     if (err != 0) {
-        goto done;
+        return err;
     }
 
     LOG_DBG("sleep mode %s", sleep ? "enabled" : "disabled");
-
-done:
-    k_sem_give(&drv_data->lock);
-    return err;
+    return 0;
 }
 
 static int max17048_sample_fetch(const struct device *dev, enum sensor_channel chan) {
+    struct max17048_drv_data *const data = dev->data;
 
-    struct max17048_drv_data *const drv_data = dev->data;
-    k_sem_take(&drv_data->lock, K_FOREVER);
-
-    int err = 0;
-
-    if (chan == SENSOR_CHAN_GAUGE_VOLTAGE) {
-        err = read_register(dev, REG_STATE_OF_CHARGE, &drv_data->raw_state_of_charge);
-        if (err != 0) {
-            LOG_WRN("failed to read state-of-charge: %d", err);
-            goto done;
-        }
-        LOG_DBG("read soc: %d", drv_data->raw_state_of_charge);
-
-    } else if (chan == SENSOR_CHAN_GAUGE_STATE_OF_CHARGE) {
-
-        err = read_register(dev, REG_VCELL, &drv_data->raw_vcell);
-        if (err != 0) {
-            LOG_WRN("failed to read vcell: %d", err);
-            goto done;
-        }
-        LOG_DBG("read vcell: %d", drv_data->raw_vcell);
-    } else {
+    if (chan != SENSOR_CHAN_GAUGE_VOLTAGE && chan != SENSOR_CHAN_GAUGE_STATE_OF_CHARGE) {
         LOG_DBG("unsupported channel %d", chan);
-        err = -ENOTSUP;
+        return -ENOTSUP;
     }
 
-done:
-    k_sem_give(&drv_data->lock);
-    return err;
+    int err = read_register(dev, REG_STATE_OF_CHARGE, &data->raw_state_of_charge);
+    if (err != 0) {
+        LOG_WRN("failed to read state-of-charge: %d", err);
+        return err;
+    }
+
+    err = read_register(dev, REG_VCELL, &data->raw_vcell);
+    if (err != 0) {
+        LOG_WRN("failed to read vcell: %d", err);
+        return err;
+    }
+
+    LOG_DBG("read values: soc=%d, vcell=%d", data->raw_state_of_charge, data->raw_vcell);
+
+    return 0;
 }
 
 static int max17048_channel_get(const struct device *dev, enum sensor_channel chan,
                                 struct sensor_value *val) {
-    int err = 0;
-
-    struct max17048_drv_data *const drv_data = dev->data;
-    k_sem_take(&drv_data->lock, K_FOREVER);
 
     struct max17048_drv_data *const data = dev->data;
     unsigned int tmp = 0;
@@ -162,12 +136,10 @@ static int max17048_channel_get(const struct device *dev, enum sensor_channel ch
         break;
 
     default:
-        err = -ENOTSUP;
-        break;
+        return -ENOTSUP;
     }
 
-    k_sem_give(&drv_data->lock);
-    return err;
+    return 0;
 }
 
 static int max17048_init(const struct device *dev) {
@@ -192,7 +164,6 @@ static int max17048_init(const struct device *dev) {
     // set the default rcomp value -- 0x97, as stated in the datasheet
     set_rcomp_value(dev, 0x97);
 
-    k_sem_init(&drv_data->lock, 1, 1);
     LOG_INF("device initialised at 0x%x (version %d)", config->i2c_bus.addr, ic_version);
 
     return 0;
@@ -205,11 +176,7 @@ static const struct sensor_driver_api max17048_api_table = {.sample_fetch = max1
     static struct max17048_config max17048_##inst##_config = {.i2c_bus =                           \
                                                                   I2C_DT_SPEC_INST_GET(inst)};     \
                                                                                                    \
-    static struct max17048_drv_data max17048_##inst##_drvdata = {                                  \
-        .raw_state_of_charge = 0,                                                                  \
-        .raw_charge_rate = 0,                                                                      \
-        .raw_vcell = 0,                                                                            \
-    };                                                                                             \
+    static struct max17048_drv_data max17048_##inst##_drvdata = {};                                \
                                                                                                    \
     /* This has to init after SPI master */                                                        \
     DEVICE_DT_INST_DEFINE(inst, max17048_init, NULL, &max17048_##inst##_drvdata,                   \
