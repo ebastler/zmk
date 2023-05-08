@@ -55,7 +55,7 @@ static int write_register(const struct device *dev, uint8_t reg, uint16_t value)
 static int set_rcomp_value(const struct device *dev, uint8_t rcomp_value) {
 
     struct max17048_drv_data *const drv_data = (struct max17048_drv_data *const)dev->data;
-    k_sem_take(&drv_data->lock, K_FOREVER);
+    //k_sem_take(&drv_data->lock, K_FOREVER);
 
     uint16_t tmp = 0;
     int err = read_register(dev, REG_CONFIG, &tmp);
@@ -72,14 +72,14 @@ static int set_rcomp_value(const struct device *dev, uint8_t rcomp_value) {
     LOG_DBG("set RCOMP to %d", rcomp_value);
 
 done:
-    k_sem_give(&drv_data->lock);
+    //k_sem_give(&drv_data->lock);
     return err;
 }
 
 static int set_sleep_enabled(const struct device *dev, bool sleep) {
 
     struct max17048_drv_data *const drv_data = (struct max17048_drv_data *const)dev->data;
-    k_sem_take(&drv_data->lock, K_FOREVER);
+    //k_sem_take(&drv_data->lock, K_FOREVER);
 
     uint16_t tmp = 0;
     int err = read_register(dev, REG_CONFIG, &tmp);
@@ -101,7 +101,7 @@ static int set_sleep_enabled(const struct device *dev, bool sleep) {
     LOG_DBG("sleep mode %s", sleep ? "enabled" : "disabled");
 
 done:
-    k_sem_give(&drv_data->lock);
+    //k_sem_give(&drv_data->lock);
     return err;
 }
 
