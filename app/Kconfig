@@ -630,6 +630,14 @@ config ZMK_KEYMAP_SENSORS_DEFAULT_TRIGGERS_PER_ROTATION
       detents per rotation of the encoder.
     default 20
 
+config ZMK_EC11_AUTO_OFF_IDLE
+        bool "Turn off rotary encoders when keyboard goes into idle state"
+        default n
+
+config ZMK_EC11_AUTO_OFF_SLEEP
+        bool "Turn off rotary encoders when keyboard goes into sleep state"
+        default n
+
 endif # ZMK_KEYMAP_SENSORS
 
 choice CBPRINTF_IMPLEMENTATION
