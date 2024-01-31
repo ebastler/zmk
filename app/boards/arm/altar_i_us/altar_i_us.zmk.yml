@@ -1,0 +1,12 @@
+file_format: "1"
+id: altar_i_us
+name: ALTAR I - US
+type: board
+arch: arm
+features:
+  - keys
+  - encoder
+outputs:
+  - usb
+  - ble
+url: https://electronicmaterialsoffice.com/
